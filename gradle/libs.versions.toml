@@ -37,6 +37,7 @@ jetbrains-atomicfu = "0.29.0"
 jetbrains-coroutines = "1.10.2"
 junit5 = "5.13.4"
 kotest = "6.0.3"
+mockk = "1.14.5"
 
 ####################################################################################################
 ####                                                                                             ###
@@ -63,6 +64,7 @@ kotest-property = { group = "io.kotest", name = "kotest-property", version.ref =
 kotlin-bom = { group = "org.jetbrains.kotlin", name = "kotlin-bom", version.ref = "kotlin-language" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin-language" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 
 ####################################################################################################
 ####                                                                                             ###
@@ -82,4 +84,5 @@ test = [
     "kotest-assertions",
     "kotest-property",
     "kotlin-test",
+    "mockk",
 ]

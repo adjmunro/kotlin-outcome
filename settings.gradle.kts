@@ -42,6 +42,7 @@ dependencyResolutionManagement {
      * configure module-specific repositories in the build.gradle.kts files of the respective modules.
      */
     repositories {
+        mavenLocal()
         mavenCentral()
         google()
 

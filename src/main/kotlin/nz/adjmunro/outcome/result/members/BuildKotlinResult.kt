@@ -11,7 +11,7 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 /**
- * Context runner to encapsulate the result of [block] as a [nz.adjmunro.outcome.result.KotlinResult].
+ * Context runner to encapsulate the result of [block] as a [KotlinResult][nz.adjmunro.outcome.result.KotlinResult].
  *
  * - If [block] throws a [non-fatal][Throwable.isFatal] exception, the [Throwable] is encapsulated as a [Result.failure].
  * - If [block] throws a **[fatal][Throwable.isFatal]** exception, the [Throwable] is re-thrown!
