@@ -50,7 +50,7 @@ public inline fun <CacheIn, CacheOut, Error> ErrorWithCache<CacheIn, Error>.mapC
  * Transforms the encapsulated [error][ErrorWithCache.error].
  *
  * @param transform Transforms the [error][ErrorWithCache.error] from [ErrorIn] to [ErrorOut].
- * @return A new [ErrorWithCache] instance of type [ErrorOut] and [Cache].
+ * @return A new [ErrorWithCache] instance of type [Cache] and [ErrorOut].
  *
  * @see ErrorWithCache.map
  * @see ErrorWithCache.mapCache
