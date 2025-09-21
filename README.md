@@ -24,7 +24,7 @@ TL;DR: idiomatic kotlin; `sealed` & `inline`; `<Error: Any>`; short-circuit via 
 - Taking the advice "to keep your nulls at the exterior surface of your program, not allowing them into your program's core domain" to heart, all my generic types extend `Any` and explicitly *do not* support nullable types.
   - I actually, think this definitely not null restriction adds interesting constraints that force your to rethink and write better, type-safe code.
   - Also, the functions are much easier to write without null considerations (believe me, I tried that too, 2-3 iterations ago. Not difficult, just ...messy?).
-- `Fetch` represents 3 async states: `Initial`, `Fetching`, and `Finished`.
+- `Fetch` represents 3 async states: `Prefetch`, `Fetching`, and `Finished`.
   - It has it's own `FlowCollector` runner which automatically produces `Fetching` when called, and wraps the `return` / tail in `Finished`, completely absolving you of `Fetch` state management.
   - Following the single-responsibility principle, the intention here is to wrap a `Outcome` in a `Fetch`, with each providing it's own behaviour.
   - Basically this was made because we inherited a stupid quasi `Fetch`/`Result` at work that doubled up all the success/failure function maintenance (and also I was curious about making a custom `FlowCollector` context runner).
