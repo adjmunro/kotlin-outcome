@@ -12,6 +12,8 @@ project-artifact-id = "outcome"
 project-version-major = "0"
 project-version-minor = "2"
 project-version-patch = "0"
+project-android-compileSdk = "36"
+project-android-minSdk = "1"
 
 ####################################################################################################
 #####################################   Language & Compiler   ######################################
@@ -24,7 +26,7 @@ java-toolchain = "21"
 java-bytecode = "17"
 
 # Kotlin Language/Compiler Version
-kotlin-language = "2.2.0"
+kotlin-language = "2.2.20"
 
 ####################################################################################################
 ########################################   App Libraries   #########################################
@@ -33,8 +35,8 @@ adjmunro-inline = "0.3.0"
 dokka = "2.0.0"
 jetbrains-atomicfu = "0.29.0"
 jetbrains-coroutines = "1.10.2"
-junit5 = "5.13.2"
-kotest = "5.9.0"
+junit5 = "5.13.4"
+kotest = "6.0.3"
 
 ####################################################################################################
 ####                                                                                             ###

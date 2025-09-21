@@ -1,4 +1,3 @@
-import org.gradle.accessors.dm.LibrariesForLibs.VersionAccessors
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,24 +7,36 @@ plugins {
     `maven-publish`
 }
 
-private val Project.semver: String by lazy {
-    val major = version { project.version.major }
-    val minor = version { project.version.minor }
-    val patch = version { project.version.patch }
-    return@lazy "$major.$minor.$patch"
+data class ProjectInfo(
+    val groupId: String = libs.versions.project.group.id.get(),
+    val artifactId: String = libs.versions.project.artifact.id.get(),
+    val moduleId: String? = null,
+    val major: String = libs.versions.project.version.major.get(),
+    val minor: String = libs.versions.project.version.minor.get(),
+    val patch: String = libs.versions.project.version.patch.get(),
+    val javaToolchain: String = libs.versions.java.toolchain.get(),
+    val javaBytecode: String = libs.versions.java.bytecode.get(),
+    val androidCompileSdk: Int = libs.versions.project.android.compileSdk.get().toInt(),
+    val androidMinSdk: Int = libs.versions.project.android.minSdk.get().toInt(),
+) {
+    val androidNamespace: String by lazy {
+        moduleId?.let { "${groupId}.${artifactId}.$it" } ?: "${groupId}.${artifactId}"
+    }
+    val moduleArtifactId: String by lazy {
+        moduleId?.let { "${artifactId}-$it" } ?: artifactId
+    }
+    val semanticVersion: String by lazy {
+        "$major.$minor.$patch"
+    }
 }
 
-private fun Project.version(selector: VersionAccessors.() -> Provider<String>): String {
-    return this@version.libs.versions.selector().get()
-}
-
-group = version { project.group.id }
-version = semver
+val info = ProjectInfo()
+group = info.groupId
+version = info.semanticVersion
 
 java {
-    sourceCompatibility = JavaVersion.toVersion(version { java.toolchain })
-    targetCompatibility = JavaVersion.toVersion(version { java.bytecode })
-
+    sourceCompatibility = JavaVersion.toVersion(/* value = */ info.javaToolchain)
+    targetCompatibility = JavaVersion.toVersion(/* value = */ info.javaBytecode)
     withSourcesJar()
 }
 
@@ -34,11 +45,11 @@ kotlin {
     explicitApi()
 
     // JDK version used by compiler & tooling.
-    jvmToolchain(version { java.toolchain } .toInt())
+    jvmToolchain(jdkVersion = info.javaToolchain.toInt())
 
     compilerOptions {
         // Target version of the generated JVM bytecode.
-        jvmTarget = JvmTarget.fromTarget(target = version { java.bytecode })
+        jvmTarget = JvmTarget.fromTarget(target = info.javaBytecode)
 
         // Free compiler args
         freeCompilerArgs.addAll(
@@ -58,12 +69,13 @@ kotlin {
 }
 
 sourceSets {
-    val main by getting { kotlin.srcDirs("src/main/kotlin") }
-    val test by getting { kotlin.srcDirs("src/test/kotlin") }
+    getting { kotlin.srcDirs("src/main/kotlin") }
+    getting { kotlin.srcDirs("src/test/kotlin") }
 }
 
 tasks.wrapper {
     gradleVersion = "latest"
+    distributionType = Wrapper.DistributionType.ALL
 }
 
 tasks.test {
@@ -90,18 +102,18 @@ jacoco {
 }
 
 tasks.register<Jar>("dokkaJar") {
-    from(tasks.dokkaGeneratePublicationHtml)
     dependsOn(tasks.dokkaGeneratePublicationHtml)
+    from(tasks.dokkaGeneratePublicationHtml)
     archiveClassifier.set("javadoc")
 }
 
 publishing {
     publications {
-        register<MavenPublication>(name = "outcome-maven-artifact") {
-            from(components["kotlin"])
-            groupId = version { project.group.id }
-            artifactId = version { project.artifact.id }
-            version = semver
+        register<MavenPublication>(name = "${info.moduleArtifactId}-maven-artifact") {
+            from(/* component = */ components["kotlin"])
+            groupId = info.groupId
+            artifactId = info.moduleArtifactId
+            version = info.semanticVersion
         }
     }
     repositories {
