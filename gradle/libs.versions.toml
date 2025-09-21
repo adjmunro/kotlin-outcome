@@ -12,6 +12,8 @@ project-artifact-id = "outcome"
 project-version-major = "0"
 project-version-minor = "2"
 project-version-patch = "0"
+project-android-compileSdk = "36"
+project-android-minSdk = "1"
 
 ####################################################################################################
 #####################################   Language & Compiler   ######################################
