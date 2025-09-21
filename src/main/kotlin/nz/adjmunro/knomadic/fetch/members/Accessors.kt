@@ -6,7 +6,6 @@ import nz.adjmunro.knomadic.fetch.FetchDsl
 import nz.adjmunro.knomadic.fetch.Fetching
 import nz.adjmunro.knomadic.fetch.Finished
 import nz.adjmunro.knomadic.fetch.Prefetch
-import kotlin.contracts.contract
 
 /**
  * Unwrap the internal value of a [Fetch], or [default].
@@ -44,7 +43,6 @@ public inline fun <T> Fetch<T & Any>.getOrElse(recover: (Fetch<T & Any>) -> T): 
  */
 @FetchDsl
 public fun <T: Any> Fetch<T>.getOrNull(): T? {
-    contract { returnsNotNull() implies (this@getOrNull is Finished<T>) }
     return fold(prefetch = ::nulls, fetching = Fetching<T>::cache, finished = Finished<T>::result)
 }
 
@@ -60,8 +58,6 @@ public fun <T: Any> Fetch<T>.getOrNull(): T? {
  */
 @FetchDsl
 public fun <T: Any> Fetch<T>.getOrThrow(): T {
-    contract { returns(null) implies (this@getOrThrow is Prefetch) }
-    
     return fold(
         prefetch = { error("Fetch has not started!") },
         fetching = { cache ?: error("Fetch has not finished! (no result or cache)") },
