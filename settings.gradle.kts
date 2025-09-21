@@ -1,4 +1,4 @@
-rootProject.name = "knomadic"
+rootProject.name = "outcome"
 
 fun getProperty(gradlePropertiesName: String, systemEnvName: String, instructions: String): String {
     val result = providers.gradleProperty(gradlePropertiesName).orNull
