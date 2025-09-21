@@ -57,7 +57,7 @@ dependencyResolutionManagement {
             instructions = "Please set it to a valid GitHub token with `read:packages` permission."
         )
 
-        listOf("adjmunro/project-inline").forEach { repository ->
+        listOf("adjmunro/project-utils").forEach { repository ->
             maven {
                 url = uri("https://maven.pkg.github.com/$repository")
                 credentials {
