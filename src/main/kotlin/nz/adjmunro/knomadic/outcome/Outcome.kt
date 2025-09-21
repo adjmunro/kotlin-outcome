@@ -1,6 +1,6 @@
 package nz.adjmunro.knomadic.outcome
 
-import nz.adjmunro.knomadic.KotlinResult
+import nz.adjmunro.knomadic.result.KotlinResult
 import nz.adjmunro.knomadic.outcome.members.errorOrNull
 import nz.adjmunro.knomadic.outcome.members.getOrNull
 import nz.adjmunro.knomadic.outcome.members.outcomeOf
