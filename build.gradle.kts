@@ -64,6 +64,7 @@ sourceSets {
 
 tasks.wrapper {
     gradleVersion = "latest"
+    distributionType = Wrapper.DistributionType.ALL
 }
 
 tasks.test {
