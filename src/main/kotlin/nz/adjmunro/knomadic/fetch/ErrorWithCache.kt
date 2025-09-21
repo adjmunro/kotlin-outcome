@@ -1,7 +1,7 @@
 package nz.adjmunro.knomadic.fetch
 
 /**
- * A utility class that can be used in tandem with [Fetch] to provide and error with some cached data.
+ * A utility class that can be used in tandem with [Fetch] to provide an error with some cached data.
  */
 @FetchDsl
 public data class ErrorWithCache<out Ok : Any, out Error : Any>(
