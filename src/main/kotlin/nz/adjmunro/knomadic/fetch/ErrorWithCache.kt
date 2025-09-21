@@ -34,7 +34,7 @@ public inline fun <CacheIn, CacheOut, ErrorIn, ErrorOut> ErrorWithCache<CacheIn,
  * Transforms the encapsulated [cache][ErrorWithCache.cache].
  *
  * @param transform Transforms the [cache][ErrorWithCache.cache] from nullable [CacheIn] to [CacheOut].
- * @return A new [ErrorWithCache] instance of type [Error] and [CacheOut].
+ * @return A new [ErrorWithCache] instance of type [CacheOut] and [Error].
  *
  * @see ErrorWithCache.map
  * @see ErrorWithCache.mapError
