@@ -3,7 +3,7 @@ package nz.adjmunro.outcome.fetch.flow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
-import nz.adjmunro.outcome.FetchFlow
+import nz.adjmunro.outcome.fetch.FetchFlow
 import nz.adjmunro.outcome.fetch.Fetch
 import nz.adjmunro.outcome.fetch.FetchDsl
 import nz.adjmunro.outcome.fetch.Fetching

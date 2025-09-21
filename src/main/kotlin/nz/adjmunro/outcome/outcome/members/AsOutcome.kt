@@ -3,14 +3,12 @@
 package nz.adjmunro.outcome.outcome.members
 
 import nz.adjmunro.inline.unit
-import nz.adjmunro.outcome.KnomadicDsl
 import nz.adjmunro.outcome.outcome.Failure
 import nz.adjmunro.outcome.outcome.Faulty
 import nz.adjmunro.outcome.outcome.Maybe
 import nz.adjmunro.outcome.outcome.Outcome
 import nz.adjmunro.outcome.outcome.OutcomeDsl
 import nz.adjmunro.outcome.outcome.Success
-
 
 /** Wrap any [T] as an outcome [Success]. */
 @OutcomeDsl

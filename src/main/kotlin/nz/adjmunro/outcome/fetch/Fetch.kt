@@ -3,8 +3,6 @@ package nz.adjmunro.outcome.fetch
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.withTimeout
-import nz.adjmunro.outcome.FetchCollector
-import nz.adjmunro.outcome.FetchFlow
 import kotlin.time.Duration
 
 /**

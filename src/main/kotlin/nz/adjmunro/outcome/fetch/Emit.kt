@@ -1,9 +1,7 @@
 package nz.adjmunro.outcome.fetch
 
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
-import nz.adjmunro.outcome.FetchCollector
 import nz.adjmunro.outcome.util.nonFatalOrThrow
 
 /**

@@ -1,20 +1,17 @@
-package nz.adjmunro.outcome
+package nz.adjmunro.outcome.fetch
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
-import nz.adjmunro.outcome.fetch.Fetch
-import nz.adjmunro.outcome.fetch.fetch
 import nz.adjmunro.outcome.outcome.Faulty
 import nz.adjmunro.outcome.outcome.Maybe
 import nz.adjmunro.outcome.outcome.Outcome
 import nz.adjmunro.outcome.result.KotlinResult
 
-
 /**
  * Alias for a [Flow] of [Fetch] statuses.
  * @see fetch
  */
-@KnomadicDsl
+@FetchDsl
 public typealias FetchFlow<T> = Flow<Fetch<T>>
 
 /**
@@ -24,7 +21,7 @@ public typealias FetchFlow<T> = Flow<Fetch<T>>
  *
  * @see fetch
  */
-@KnomadicDsl
+@FetchDsl
 internal typealias FetchCollector<T> = FlowCollector<Fetch<T>>
 
 /**
@@ -40,7 +37,7 @@ internal typealias FetchCollector<T> = FlowCollector<Fetch<T>>
  * @see fetch
  * @see Faulty
  */
-@KnomadicDsl
+@FetchDsl
 public typealias FaultyFetch<Error> = Flow<Fetch<Faulty<Error>>>
 
 /**
@@ -56,7 +53,7 @@ public typealias FaultyFetch<Error> = Flow<Fetch<Faulty<Error>>>
  * @see fetch
  * @see Maybe
  */
-@KnomadicDsl
+@FetchDsl
 public typealias MaybeFetch<Ok> = Flow<Fetch<Maybe<Ok>>>
 
 /**
@@ -72,7 +69,7 @@ public typealias MaybeFetch<Ok> = Flow<Fetch<Maybe<Ok>>>
  * @see fetch
  * @see Outcome
  */
-@KnomadicDsl
+@FetchDsl
 public typealias OutcomeFetch<Ok, Error> = Flow<Fetch<Outcome<Ok, Error>>>
 
 /**
@@ -88,5 +85,5 @@ public typealias OutcomeFetch<Ok, Error> = Flow<Fetch<Outcome<Ok, Error>>>
  * @see fetch
  * @see KotlinResult
  */
-@KnomadicDsl
+@FetchDsl
 public typealias ResultFetch<Ok> = Flow<Fetch<KotlinResult<Ok>>>

@@ -4,8 +4,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.AbstractFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withTimeout
-import nz.adjmunro.outcome.FetchCollector
-import nz.adjmunro.outcome.FetchFlow
 import nz.adjmunro.outcome.util.nonFatalOrThrow
 import kotlin.time.Duration
 

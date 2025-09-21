@@ -1,7 +1,7 @@
 package nz.adjmunro.outcome.fetch.flow
 
 import kotlinx.coroutines.flow.map
-import nz.adjmunro.outcome.FetchFlow
+import nz.adjmunro.outcome.fetch.FetchFlow
 import nz.adjmunro.outcome.fetch.Fetch
 import nz.adjmunro.outcome.fetch.FetchDsl
 import nz.adjmunro.outcome.fetch.members.toFaulty
