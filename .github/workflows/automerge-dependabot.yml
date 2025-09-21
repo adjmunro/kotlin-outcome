@@ -3,6 +3,7 @@ name: Automerge Dependabot
 on:
   workflow_dispatch: # Manual dispatch from the Actions tab in GitHub.
   workflow_call: # Allows this workflow to be called from other workflows.
+    secrets: inherit
 
 jobs:
   automerge-dependabot-job:

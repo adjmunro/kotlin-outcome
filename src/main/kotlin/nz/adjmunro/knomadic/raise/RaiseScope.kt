@@ -1,7 +1,7 @@
 package nz.adjmunro.knomadic.raise
 
+import kotlinx.atomicfu.AtomicBoolean
 import kotlinx.atomicfu.atomic
-import nz.adjmunro.knomadic.KnomadicDsl
 import nz.adjmunro.knomadic.raise.RaiseScope.Companion.catch
 import nz.adjmunro.knomadic.raise.RaiseScope.Companion.fold
 import nz.adjmunro.knomadic.raise.RaiseScope.Companion.raise
@@ -9,7 +9,7 @@ import nz.adjmunro.knomadic.raise.RaiseScope.Companion.default
 import nz.adjmunro.knomadic.raise.exception.RaiseCancellationException
 import nz.adjmunro.knomadic.raise.exception.RaiseScopeLeakedException
 import nz.adjmunro.knomadic.util.nonFatalOrThrow
-import nz.adjmunro.knomadic.inline.rethrow
+import nz.adjmunro.inline.rethrow
 import kotlin.contracts.InvocationKind.AT_MOST_ONCE
 import kotlin.contracts.contract
 
@@ -24,6 +24,7 @@ import kotlin.contracts.contract
  *
  * @see fold
  */
+@RaiseDsl
 public sealed interface RaiseScope<in Error : Any> {
 
     /**
@@ -31,7 +32,7 @@ public sealed interface RaiseScope<in Error : Any> {
      *
      * *This is to prevent the scope from being leaked.*
      */
-    @KnomadicDsl
+    @RaiseDsl
     public fun complete()
 
     /**
@@ -42,11 +43,11 @@ public sealed interface RaiseScope<in Error : Any> {
      * @throws RaiseCancellationException When [RaiseScope] is active.
      * @throws RaiseScopeLeakedException If [RaiseScope.complete] has already been called.
      */
-    @KnomadicDsl
+    @RaiseDsl
     public fun raised(error: Error): Nothing
 
     public class DefaultRaise<in Error : Any> @PublishedApi internal constructor() : RaiseScope<Error> {
-        private val active = atomic(initial = true)
+        private val active: AtomicBoolean = atomic(initial = true)
 
         override fun complete() {
             active.getAndSet(value = false)
@@ -77,8 +78,8 @@ public sealed interface RaiseScope<in Error : Any> {
          * @throws Error If the block of code throws (provided [catch] maps [Throwable] to [Error]).
          * @throws Throwable if [catch] re-throws.
          */
-        @KnomadicDsl
-        public inline fun <Ok : Any, Error : Any> RaiseScope<Error>.catch(
+        @RaiseDsl
+        public inline fun <Ok, Error : Any> RaiseScope<Error>.catch(
             catch: (throwable: Throwable) -> Error = ::rethrow,
             @BuilderInference block: RaiseScope<Error>.() -> Ok,
         ): Ok {
@@ -87,41 +88,39 @@ public sealed interface RaiseScope<in Error : Any> {
                 callsInPlace(block, AT_MOST_ONCE)
             }
 
-            return try {
-                block()
-            } catch (e: Throwable) {
+            return try { block() } catch (e: Throwable) {
                 raised(error = catch(e.nonFatalOrThrow()))
             }
         }
 
-        @KnomadicDsl
-        public inline fun <Ok : Any, Error : Any> Companion.default(
+        @RaiseDsl
+        public inline fun <Ok, Error : Any> Companion.default(
             @BuilderInference action: RaiseScope<Error>.() -> Ok,
-        ): Ok = with(receiver = DefaultRaise<Error>(), action)
+        ): Ok = with(receiver = DefaultRaise(), block = action)
 
         /** Ensures that the given [condition] is true, otherwise [raises][raise] an [Error]. */
-        @KnomadicDsl
+        @RaiseDsl
         public inline fun <Error : Any> RaiseScope<Error>.ensure(
             condition: Boolean,
             raise: () -> Error,
         ) {
             contract { returns() implies condition }
-            if (condition) raise(raise)
+            if (condition) raise(error = raise)
         }
 
         /** Ensures that the given [value] is not `null`, otherwise [raises][raise] an [Error]. */
-        @KnomadicDsl
+        @RaiseDsl
         public inline fun <Ok : Any, Error : Any> RaiseScope<Error>.ensureNotNull(
             value: Ok?,
             raise: () -> Error,
         ): Ok {
             contract { returns() implies (value != null) }
-            return value ?: raise(raise)
+            return value ?: raise(error = raise)
         }
 
-        @KnomadicDsl
+        @RaiseDsl
         @Suppress("UNCHECKED_CAST")
-        public inline fun <In : Any, Out : Any, Error : Any> RaiseScope<Error>.fold(
+        public inline fun <In, Out, Error : Any> RaiseScope<Error>.fold(
             block: (scope: RaiseScope<Error>) -> In,
             catch: (throwable: Throwable) -> Out = ::rethrow,
             recover: (error: Error) -> Out,
@@ -157,7 +156,7 @@ public sealed interface RaiseScope<in Error : Any> {
          * @throws RaiseScopeLeakedException If [RaiseScope.complete] has already been called.
          * @see RaiseScope.raise
          */
-        @KnomadicDsl
+        @RaiseDsl
         public inline fun <Error : Any> RaiseScope<Error>.raise(
             error: () -> Error
         ): Nothing = raised(error = error())

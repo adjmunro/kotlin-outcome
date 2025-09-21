@@ -1,39 +1,42 @@
 package nz.adjmunro.knomadic.fetch.members
 
-import nz.adjmunro.knomadic.KnomadicDsl
 import nz.adjmunro.knomadic.fetch.Fetch
+import nz.adjmunro.knomadic.fetch.FetchDsl
+import nz.adjmunro.knomadic.fetch.Fetching
+import nz.adjmunro.knomadic.fetch.Finished
+import nz.adjmunro.knomadic.fetch.Prefetch
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 /**
- * Transform each [Fetch] status into an [Output].
+ * Transform all [Fetch] status into the [Output] type.
  *
- * - Unlike [mapFinished][Fetch.mapFinished], `fold` places no restrictions on [Output] type.
- * - If [Output] is [Fetch], `fold` can be used to `flatMap` all fetch statuses.
+ * *Fold can be used to `map` or `flatMap` all [Fetch] variants,
+ * but it also can output any type.*
  * 
  * @receiver The [Fetch] to fold.
- * @param T The type of the [Fetch] value.
+ * @param Data The type of the [Fetch] value.
  * @param Output The type of the folded value.
- * @param initial The lambda to transform the [Fetch.Initial] status into an [Output].
- * @param fetching The lambda to transform the [Fetch.Fetching] status into an [Output].
- * @param finished The lambda to transform the [Fetch.Finished] status into an [Output].
- * @return The folded value of type [Output].
+ * @param prefetch The lambda to transform the [Prefetch] status.
+ * @param fetching The lambda to transform the [Fetching] status.
+ * @param finished The lambda to transform the [Finished] status.
+ * @return The folded value, of type [Output].
  */
-@KnomadicDsl
-public inline fun <T : Any, Output: Any?> Fetch<T>.fold(
-    initial: () -> Output,
-    fetching: () -> Output,
-    finished: (result: T) -> Output,
+@FetchDsl
+public inline fun <Data : Any, Output> Fetch<Data>.fold(
+    prefetch: Prefetch.() -> Output,
+    fetching: Fetching<Data>.() -> Output,
+    finished: Finished<Data>.() -> Output,
 ): Output {
     contract { 
-        callsInPlace(initial, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(prefetch, InvocationKind.AT_MOST_ONCE)
         callsInPlace(fetching, InvocationKind.AT_MOST_ONCE)
         callsInPlace(finished, InvocationKind.AT_MOST_ONCE)
     }
     
     return when (this@fold) {
-        is Fetch.Initial -> initial()
-        is Fetch.Fetching -> fetching()
-        is Fetch.Finished -> finished(result)
+        is Prefetch -> prefetch()
+        is Fetching<Data> -> fetching()
+        is Finished<Data> -> finished()
     }
 }

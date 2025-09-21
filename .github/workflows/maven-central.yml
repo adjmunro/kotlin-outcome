@@ -32,10 +32,6 @@ jobs:
         if: env.IS_CANCELLED == 'false'
         uses: ./.github/actions/setup-gradle
 
-      - name: Restore Gradle Build Cache
-        if: env.IS_CANCELLED == 'false'
-        uses: ./.github/actions/cache-gradle
-
       - name: Publish package
         if: env.IS_CANCELLED == 'false'
         run: ./gradlew publish # TODO: Note this is for all publish repos

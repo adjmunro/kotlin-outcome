@@ -4,13 +4,16 @@ name: Publish to GitHub Packages
 on:
   workflow_dispatch: # Manual dispatch from the Actions tab in GitHub.
   workflow_call: # Allows this workflow to be called from other workflows.
+    secrets: inherit
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       packages: write
+
     steps:
       - uses: actions/checkout@v4
 

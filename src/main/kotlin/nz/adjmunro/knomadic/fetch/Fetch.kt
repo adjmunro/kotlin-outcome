@@ -5,18 +5,17 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.withTimeout
 import nz.adjmunro.knomadic.FetchCollector
 import nz.adjmunro.knomadic.FetchFlow
-import nz.adjmunro.knomadic.KnomadicDsl
 import kotlin.time.Duration
 
 /**
  * Create a new [FetchFlow] with the given [block] of code to execute.
  *
- * - [Fetch.Initial] is for default states, and is not emitted by the resulting [FetchFlow].
- * - [Fetch.Fetching] is emitted automatically *before* [block] is executed.
- * - [Fetch.Finished] automatically encapsulates the result of [block].
+ * - [Prefetch] is for default states, and is not emitted by the resulting [FetchFlow].
+ * - [Fetching] is emitted automatically *before* [block] is executed.
+ * - [Finished] automatically encapsulates the result of [block].
  *
  * However, you can manually [emit][FlowCollector.emit] these statuses via
- * [emit][FlowCollector.emit], [reset], [fetching], and [finished].
+ * [emit][FlowCollector.emit], [prefetch], [fetching], and [finished].
  *
  * @param T The type of the result of the fetch.
  * @param timeout The duration to wait [withTimeout] for the fetch [block] to complete once.
@@ -25,11 +24,11 @@ import kotlin.time.Duration
  * @return [FetchFlow] -- a [Flow] that encapsulates the [Fetch] behaviour.
  * @see SafeFetchFlow
  */
-@KnomadicDsl
+@FetchDsl
 public fun <T : Any> fetch(
     timeout: Duration = Duration.INFINITE,
     recover: FetchCollector<T>.(Throwable) -> Fetch<T> = { throw it },
-    @BuilderInference block: suspend FetchCollector<T>.() -> T,
+    block: suspend FetchCollector<T>.() -> T,
 ): FetchFlow<T> = SafeFetchFlow(
     timeout = timeout,
     recover = recover,
@@ -37,44 +36,57 @@ public fun <T : Any> fetch(
 )
 
 /**
- * A wrapper for asynchronous fetch operations.
+ * Encapsulates a reactive asynchronous future, such as.
  *
- * - [Fetch.Initial] is for default states, and is not generally emitted;
- * - [Fetch.Fetching] is emitted automatically *before* the fetch operation is executed when using [fetch];
- * - [Fetch.Finished] automatically encapsulates the result of the fetch operation.
+ * - [Prefetch] is for default states, and is not generally emitted;
+ * - [Fetching] is emitted automatically *before* the fetch operation is executed when using [fetch];
+ * - [Finished] automatically encapsulates the result of the fetch operation.
  *
  * @see fetch
  * @see FetchFlow
  */
-public sealed interface Fetch<out T : Any> {
+public sealed interface Fetch<out T : Any>
 
-    /**
-     * A fetch operation that has not yet been started.
-     *
-     * *This is for default states, and is not generally emitted.*
-     */
-    public data object Initial : Fetch<Nothing>
+/**
+ * A fetch operation that has not yet been started.
+ *
+ * *This is for default states, and is not generally emitted.*
+ */
+@FetchDsl
+public data object Prefetch : Fetch<Nothing>
 
-    /**
-     * A fetch operation that is currently in progress.
-     *
-     * *This is emitted automatically before the fetch operation is executed when using [fetch].*
-     */
-    public data object Fetching : Fetch<Nothing>
 
-    /**
-     * A fetch operation that has finished.
-     *
-     * *Following the single-responsibility principle, the success or failure of the [fetch] is left
-     * up to the encapsulated type, [T]. It is recommended to use a [Outcome] type for this purpose.*
-     *
-     * @param result The result of the fetch operation.
-     */
-    @JvmInline
-    public value class Finished<out T : Any>(public val result: T) : Fetch<T> {
-        public operator fun component1(): T = result
-        override fun toString(): String {
-            return "Fetch.Finished<${result::class.simpleName}>(result = $result)"
+/**
+ * A fetch operation that is currently in progress.
+ *
+ * *This is emitted automatically before the fetch operation is executed when using [fetch].*
+ */
+@FetchDsl
+@JvmInline
+public value class Fetching<out T : Any>(public val cache: T? = null) : Fetch<T> {
+    public operator fun component1(): T? = cache
+    override fun toString(): String {
+        return when (cache) {
+            null -> "Fetching(cache = null)"
+            else -> "Fetching<${cache::class.simpleName}>(cache = $cache)"
         }
+    }
+}
+
+/**
+ * A [fetch] operation that has finished.
+ *
+ * *Following the single-responsibility principle, the success or failure of the [fetch] is left
+ * up to the encapsulated type, [T]. It is recommended to use an
+ * [Outcome][nz.adjmunro.knomadic.outcome.Outcome] for this purpose.*
+ *
+ * @param result The [Finished] result of this [fetch] operation.
+ */
+@FetchDsl
+@JvmInline
+public value class Finished<out T : Any>(public val result: T) : Fetch<T> {
+    public operator fun component1(): T = result
+    override fun toString(): String {
+        return "FetchFinished<${result::class.simpleName}>(result = $result)"
     }
 }

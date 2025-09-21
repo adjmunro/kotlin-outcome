@@ -1,75 +1,66 @@
 package nz.adjmunro.knomadic.fetch.members
 
-import nz.adjmunro.knomadic.KnomadicDsl
+import nz.adjmunro.inline.nulls
 import nz.adjmunro.knomadic.fetch.Fetch
-import nz.adjmunro.knomadic.inline.itself
-import nz.adjmunro.knomadic.inline.nulls
-import kotlin.contracts.contract
+import nz.adjmunro.knomadic.fetch.FetchDsl
+import nz.adjmunro.knomadic.fetch.Fetching
+import nz.adjmunro.knomadic.fetch.Finished
+import nz.adjmunro.knomadic.fetch.Prefetch
 
 /**
- * @return The [result][Fetch.Finished.result] of a [Fetch] or the [default] value.
+ * Unwrap the internal value of a [Fetch], or [default].
+ * - [Prefetch] returns [default];
+ * - [Fetching] returns [cache] (or [default] if `null`);
+ * - [Finished] returns [result].
+ *
+ * @return A value of type [T].
  */
-@KnomadicDsl
+@FetchDsl
 public infix fun <T: Any> Fetch<T>.getOrDefault(default: T): T {
-    return fold(initial = { default }, fetching = { default }, finished = ::itself)
+    return fold(prefetch = { default }, fetching = { cache ?: default }, finished = Finished<T>::result)
 }
 
 /**
- * @return The [result][Fetch.Finished.result] of a [Fetch] or the result of [recover].
+ * Unwrap the internal value of a [Fetch], or [recover].
+ * - [Prefetch] returns the result of [recover];
+ * - [Fetching] returns [cache] (or [recover] if `null`);
+ * - [Finished] returns [result].
+ *
+ * @return A value of type [T].
  */
-@KnomadicDsl
-public inline fun <T: Any> Fetch<T>.getOrElse(recover: (Fetch<T>) -> T): T {
-    return fold(initial = { recover(this) }, fetching = { recover(this) }, finished = ::itself)
+@FetchDsl
+public inline fun <T> Fetch<T & Any>.getOrElse(recover: (Fetch<T & Any>) -> T): T {
+    return fold(prefetch = recover, fetching = { cache ?: recover(this) }, finished = Finished<T & Any>::result)
 }
 
 /**
- * @return The [result][Fetch.Finished.result] of a [Fetch] or `null`.
+ * Unwrap the internal value of a [Fetch], or `null`.
+ * - [Prefetch] returns `null`;
+ * - [Fetching] returns [cache] (or null);
+ * - [Finished] returns [result].
+ *
+ * @return A value of type [T], or `null`.
  */
-@KnomadicDsl
+@FetchDsl
 public fun <T: Any> Fetch<T>.getOrNull(): T? {
-    contract { 
-        returnsNotNull() implies (this@getOrNull is Fetch.Finished<T>)
-        returns(null) implies (this@getOrNull is Fetch.Initial || this@getOrNull is Fetch.Fetching)
-    }
-    
-    return fold(initial = ::nulls, fetching = ::nulls, finished = ::itself)
+    return fold(prefetch = ::nulls, fetching = Fetching<T>::cache, finished = Finished<T>::result)
 }
 
 /**
- * @return The [result][Fetch.Finished.result] of a [Fetch] or `throws`.
- * @throws IllegalStateException if the [Fetch] is a [Fetch.Initial] or [Fetch.Fetching].
+ * Unwrap the internal value of a [Fetch], or [throw][IllegalStateException].
+ *
+ * - [Prefetch] throws an [IllegalStateException];
+ * - [Fetching] returns [cache] (or [throws][IllegalStateException]);
+ * - [Finished] returns [result].
+ *
+ * @return A value of type [T].
+ * @throws IllegalStateException if the [Fetch] is a [Prefetch] or [Fetching.cache] is `null`.
  */
-@KnomadicDsl
+@FetchDsl
 public fun <T: Any> Fetch<T>.getOrThrow(): T {
-    contract { returns() implies (this@getOrThrow is Fetch.Finished<T>) }
-    
     return fold(
-        initial = { error("Fetch has not started!") },
-        fetching = { error("Fetch has not finished!") },
-        finished = ::itself,
+        prefetch = { error("Fetch has not started!") },
+        fetching = { cache ?: error("Fetch has not finished! (no result or cache)") },
+        finished = Finished<T>::result,
     )
-}
-
-/**
- * Attempt to unwrap a [Fetch] to obtain it's [result][Fetch.Finished.result] value.
- * 
- * ```kotlin
- * val fetch: Fetch<String> = Fetch.Initial
- * fetch.unwrap()           // getOrThrow() (default behaviour)
- * fetch.unwrap { null }    // getOrNull() (initial & fetching to null)
- * fetch.unwrap { "$it" }   // getOrElse() (initial & fetching to string)
- * ```
- * 
- * @return The [result][Fetch.Finished.result] of a [Fetch] or the result of [recover].
- * @throws IllegalStateException if default [recover] value is used and fetch is [initial][Fetch.Initial] or [in progress][Fetch.Fetching].
- * @see Fetch.getOrThrow
- * @see Fetch.getOrNull
- * @see Fetch.getOrElse
- * @see Fetch.getOrDefault
- */
-@KnomadicDsl
-public inline fun <T> Fetch<T & Any>.unwrap(
-    recover: (Fetch<T & Any>) -> T = { error("Fetch has not finished!") },
-): T {
-    return fold(initial = { recover(this) }, fetching = { recover(this) }, finished = ::itself)
 }

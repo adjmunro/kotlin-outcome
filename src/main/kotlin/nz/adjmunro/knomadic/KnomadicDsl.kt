@@ -1,5 +1,12 @@
 package nz.adjmunro.knomadic
 
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.TYPEALIAS, AnnotationTarget.PROPERTY)
+@Target(
+    AnnotationTarget.FILE,
+    AnnotationTarget.TYPEALIAS,
+    AnnotationTarget.CLASS,
+    AnnotationTarget.CONSTRUCTOR,
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.PROPERTY,
+)
 @DslMarker
 public annotation class KnomadicDsl

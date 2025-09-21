@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  packages: read
 
 jobs:
   assign-author:
@@ -17,9 +18,13 @@ jobs:
 
   build:
     uses: ./.github/workflows/build.yml
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   unit-tests:
     uses: ./.github/workflows/unit-tests.yml
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   # Only run for PRs created by dependabot after other all checks pass (i.e. build & unit tests)
   automerge-dependabot:
