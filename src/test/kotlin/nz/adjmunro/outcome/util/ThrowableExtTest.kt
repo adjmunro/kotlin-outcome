@@ -1,8 +1,7 @@
-package nz.adjmunro.knomadic.util
+package nz.adjmunro.outcome.util
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch

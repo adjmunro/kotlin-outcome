@@ -1,4 +1,4 @@
-package nz.adjmunro.knomadic.result.suspend
+package nz.adjmunro.outcome.result.suspend
 
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
@@ -8,16 +8,13 @@ import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import nz.adjmunro.inline.TimberExtension
-import nz.adjmunro.knomadic.result.KotlinResult
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import java.util.concurrent.atomic.AtomicInteger
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@ExtendWith(TimberExtension::class)
+//@ExtendWith(TimberExtension::class)
 class ParallelKotlinResultTest {
     @BeforeEach
     fun setup() {

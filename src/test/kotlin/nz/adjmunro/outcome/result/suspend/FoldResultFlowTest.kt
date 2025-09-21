@@ -1,4 +1,4 @@
-package nz.adjmunro.knomadic.result.suspend
+package nz.adjmunro.outcome.result.suspend
 
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import nz.adjmunro.knomadic.result.KotlinResult
+import nz.adjmunro.outcome.result.KotlinResult
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
