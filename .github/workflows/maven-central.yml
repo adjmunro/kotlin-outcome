@@ -1,40 +1,40 @@
-# Read this: https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-java-packages-with-gradle
-name: Publish to Maven Central
-
-on:
-  workflow_dispatch: # Manual dispatch from the Actions tab in GitHub.
-  workflow_call: # Allows this workflow to be called from other workflows.
-
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Reset Cancellation Flag
-        run: echo "IS_CANCELLED=false" >> $GITHUB_ENV
-
-      - name: DISABLED - Remove this step to enable job
-        run: |
-          echo "This job is currently disabled. Remove this step to enable."
-          echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 0
-
-      - name: Ensure running on main branch
-        if: ${{ github.ref != 'refs/heads/main' }}
-        run: |
-          echo "This workflow can only be run from the main branch."
-          echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
-
-      - name: Setup Java and Gradle
-        if: env.IS_CANCELLED == 'false'
-        uses: ./.github/actions/setup-gradle
-
-      - name: Publish package
-        if: env.IS_CANCELLED == 'false'
-        run: ./gradlew publish # TODO: Note this is for all publish repos
-        env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+## Read this: https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-java-packages-with-gradle
+#name: Publish to Maven Central
+#
+#on:
+#  workflow_dispatch: # Manual dispatch from the Actions tab in GitHub.
+#  workflow_call: # Allows this workflow to be called from other workflows.
+#
+#jobs:
+#  publish:
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#      packages: write
+#    steps:
+#      - uses: actions/checkout@v5
+#
+#      - name: Reset Cancellation Flag
+#        run: echo "IS_CANCELLED=false" >> $GITHUB_ENV
+#
+#      - name: DISABLED - Remove this step to enable job
+#        run: |
+#          echo "This job is currently disabled. Remove this step to enable."
+#          echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 0
+#
+#      - name: Ensure running on main branch
+#        if: ${{ github.ref != 'refs/heads/main' }}
+#        run: |
+#          echo "This workflow can only be run from the main branch."
+#          echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
+#
+#      - name: Setup Java and Gradle
+#        if: env.IS_CANCELLED == 'false'
+#        uses: ./.github/actions/setup-gradle
+#
+#      - name: Publish package
+#        if: env.IS_CANCELLED == 'false'
+#        run: ./gradlew publish # TODO: Note this is for all publish repos
+#        env:
+#          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+#          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}

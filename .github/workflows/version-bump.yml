@@ -1,140 +1,140 @@
-# This workflow increments the minor version and resets patch for human authors,
-# increments patch for bots, and triggers a release only for major/minor bumps.
-name: Version Bump
-
-on:
-  workflow_dispatch: # Manual dispatch from the Actions tab in GitHub.
-  workflow_call: # Allows this workflow to be called from other workflows.
-
-permissions:
-  contents: write
-  pull-requests: write
-
-jobs:
-  version-bump:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout PR Branch
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-          ref: ${{ github.head_ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Reset Cancellation Flag
-        run: echo "IS_CANCELLED=false" >> $GITHUB_ENV
-
-      - name: Ensure PR targets main branch
-        if: ${{ github.event.pull_request.base.ref != 'main' }}
-        run: |
-          echo "This PR does not target main. Skipping versioning."
-          echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 0
-
-      - name: Get PR author type
-        if: env.IS_CANCELLED == 'false'
-        id: author
-        run: |
-          if [[ "${{ github.event.pull_request.user.login }}" == *bot* ]]; then
-            echo "author_type=bot" >> $GITHUB_ENV
-          else
-            echo "author_type=human" >> $GITHUB_ENV
-          fi
-
-      - name: Get current version
-        if: env.IS_CANCELLED == 'false'
-        id: get_version
-        run: |
-          MAJOR=$(grep 'project-version-major' gradle/libs.versions.toml | cut -d'=' -f2 | tr -d ' "')
-          MINOR=$(grep 'project-version-minor' gradle/libs.versions.toml | cut -d'=' -f2 | tr -d ' "')
-          PATCH=$(grep 'project-version-patch' gradle/libs.versions.toml | cut -d'=' -f2 | tr -d ' "')
-          if ! [[ "$MAJOR" =~ ^[0-9]+$ && "$MINOR" =~ ^[0-9]+$ && "$PATCH" =~ ^[0-9]+$ ]]; then
-            echo >&2 "ERROR: Version fields in libs.versions.toml must be numbers. Found: major='$MAJOR', minor='$MINOR', patch='$PATCH'"
-            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
-          fi
-          echo "current_version=$MAJOR.$MINOR.$PATCH" >> $GITHUB_ENV
-          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
-          echo "MINOR=$MINOR" >> $GITHUB_ENV
-          echo "PATCH=$PATCH" >> $GITHUB_ENV
-
-      - name: Get previous version from main branch
-        if: env.IS_CANCELLED == 'false'
-        id: get_prev_version
-        run: |
-          git fetch origin main
-          PREV_MAJOR=$(git show origin/main:gradle/libs.versions.toml | grep 'project-version-major' | cut -d'=' -f2 | tr -d ' "')
-          PREV_MINOR=$(git show origin/main:gradle/libs.versions.toml | grep 'project-version-minor' | cut -d'=' -f2 | tr -d ' "')
-          PREV_PATCH=$(git show origin/main:gradle/libs.versions.toml | grep 'project-version-patch' | cut -d'=' -f2 | tr -d ' "')
-          if ! [[ "$PREV_MAJOR" =~ ^[0-9]+$ && "$PREV_MINOR" =~ ^[0-9]+$ && "$PREV_PATCH" =~ ^[0-9]+$ ]]; then
-            echo >&2 "ERROR: Previous version fields in main branch libs.versions.toml must be numbers. Found: major='$PREV_MAJOR', minor='$PREV_MINOR', patch='$PREV_PATCH'"
-            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
-          fi
-          echo "prev_version=$PREV_MAJOR.$PREV_MINOR.$PREV_PATCH" >> $GITHUB_ENV
-          echo "PREV_MAJOR=$PREV_MAJOR" >> $GITHUB_ENV
-          echo "PREV_MINOR=$PREV_MINOR" >> $GITHUB_ENV
-          echo "PREV_PATCH=$PREV_PATCH" >> $GITHUB_ENV
-
-      - name: Cancel if already versioned
-        if: env.IS_CANCELLED == 'false'
-        run: |
-          if [[ "$MAJOR" != "$PREV_MAJOR" || "$MINOR" != "$PREV_MINOR" || "$PATCH" != "$PREV_PATCH" ]]; then
-            echo "Version already incremented (major, minor, or patch differs from main). Cancelling workflow."
-            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 0
-          fi
-
-      - name: Increment version
-        if: env.IS_CANCELLED == 'false'
-        id: increment_version
-        run: |
-          # Defensive: ensure all values are integers
-          MAJOR=${MAJOR:-0}
-          MINOR=${MINOR:-0}
-          PATCH=${PATCH:-0}
-          PREV_MAJOR=${PREV_MAJOR:-0}
-          PREV_MINOR=${PREV_MINOR:-0}
-          PREV_PATCH=${PREV_PATCH:-0}
-
-          if [[ "$MAJOR" -gt "$PREV_MAJOR" ]]; then
-            # Manual major bump detected
-            MINOR=0
-            PATCH=0
-            echo "Manual major bump detected. Minor and patch reset to 0."
-          elif [[ "$author_type" == "human" ]]; then
-            MINOR=$((MINOR+1))
-            PATCH=0
-            echo "Author is human. Minor version increased, and patch reset to 0."
-          else
-            PATCH=$((PATCH+1))
-            echo "Author is bot. Patch version increased."
-          fi
-          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
-          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
-          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
-          echo "MINOR=$MINOR" >> $GITHUB_ENV
-          echo "PATCH=$PATCH" >> $GITHUB_ENV
-
-      - name: Update version in libs.versions.toml
-        if: env.IS_CANCELLED == 'false'
-        run: |
-          # Use portable sed for both macOS and Linux
-          if sed --version 2>/dev/null | grep -q GNU; then
-            SED_CMD="sed -i"
-          else
-            SED_CMD="sed -i ''"
-          fi
-          $SED_CMD -E "s/project-version-major[ ]*=[ ]*\"[0-9]+\"/project-version-major = \"$MAJOR\"/" gradle/libs.versions.toml
-          $SED_CMD -E "s/project-version-minor[ ]*=[ ]*\"[0-9]+\"/project-version-minor = \"$MINOR\"/" gradle/libs.versions.toml
-          $SED_CMD -E "s/project-version-patch[ ]*=[ ]*\"[0-9]+\"/project-version-patch = \"$PATCH\"/" gradle/libs.versions.toml
-          echo "Updated version lines:" && grep 'project-version-' gradle/libs.versions.toml
-
-      - name: Commit and push version bump
-        if: env.IS_CANCELLED == 'false'
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git add gradle/libs.versions.toml
-          if git diff --cached --exit-code; then
-            echo "No changes to commit. Skipping push."
-            exit 0
-          fi
-          git commit -m "Bump version to $new_version"
-          git push origin HEAD:${{ github.head_ref }}
+## This workflow increments the minor version and resets patch for human authors,
+## increments patch for bots, and triggers a release only for major/minor bumps.
+#name: Version Bump
+#
+#on:
+#  workflow_dispatch: # Manual dispatch from the Actions tab in GitHub.
+#  workflow_call: # Allows this workflow to be called from other workflows.
+#
+#permissions:
+#  contents: write
+#  pull-requests: write
+#
+#jobs:
+#  version-bump:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout PR Branch
+#        uses: actions/checkout@v5
+#        with:
+#          fetch-depth: 0
+#          ref: ${{ github.head_ref }}
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#
+#      - name: Reset Cancellation Flag
+#        run: echo "IS_CANCELLED=false" >> $GITHUB_ENV
+#
+#      - name: Ensure PR targets main branch
+#        if: ${{ github.event.pull_request.base.ref != 'main' }}
+#        run: |
+#          echo "This PR does not target main. Skipping versioning."
+#          echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 0
+#
+#      - name: Get PR author type
+#        if: env.IS_CANCELLED == 'false'
+#        id: author
+#        run: |
+#          if [[ "${{ github.event.pull_request.user.login }}" == *bot* ]]; then
+#            echo "author_type=bot" >> $GITHUB_ENV
+#          else
+#            echo "author_type=human" >> $GITHUB_ENV
+#          fi
+#
+#      - name: Get current version
+#        if: env.IS_CANCELLED == 'false'
+#        id: get_version
+#        run: |
+#          MAJOR=$(grep 'project-version-major' gradle/libs.versions.toml | cut -d'=' -f2 | tr -d ' "')
+#          MINOR=$(grep 'project-version-minor' gradle/libs.versions.toml | cut -d'=' -f2 | tr -d ' "')
+#          PATCH=$(grep 'project-version-patch' gradle/libs.versions.toml | cut -d'=' -f2 | tr -d ' "')
+#          if ! [[ "$MAJOR" =~ ^[0-9]+$ && "$MINOR" =~ ^[0-9]+$ && "$PATCH" =~ ^[0-9]+$ ]]; then
+#            echo >&2 "ERROR: Version fields in libs.versions.toml must be numbers. Found: major='$MAJOR', minor='$MINOR', patch='$PATCH'"
+#            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
+#          fi
+#          echo "current_version=$MAJOR.$MINOR.$PATCH" >> $GITHUB_ENV
+#          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
+#          echo "MINOR=$MINOR" >> $GITHUB_ENV
+#          echo "PATCH=$PATCH" >> $GITHUB_ENV
+#
+#      - name: Get previous version from main branch
+#        if: env.IS_CANCELLED == 'false'
+#        id: get_prev_version
+#        run: |
+#          git fetch origin main
+#          PREV_MAJOR=$(git show origin/main:gradle/libs.versions.toml | grep 'project-version-major' | cut -d'=' -f2 | tr -d ' "')
+#          PREV_MINOR=$(git show origin/main:gradle/libs.versions.toml | grep 'project-version-minor' | cut -d'=' -f2 | tr -d ' "')
+#          PREV_PATCH=$(git show origin/main:gradle/libs.versions.toml | grep 'project-version-patch' | cut -d'=' -f2 | tr -d ' "')
+#          if ! [[ "$PREV_MAJOR" =~ ^[0-9]+$ && "$PREV_MINOR" =~ ^[0-9]+$ && "$PREV_PATCH" =~ ^[0-9]+$ ]]; then
+#            echo >&2 "ERROR: Previous version fields in main branch libs.versions.toml must be numbers. Found: major='$PREV_MAJOR', minor='$PREV_MINOR', patch='$PREV_PATCH'"
+#            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
+#          fi
+#          echo "prev_version=$PREV_MAJOR.$PREV_MINOR.$PREV_PATCH" >> $GITHUB_ENV
+#          echo "PREV_MAJOR=$PREV_MAJOR" >> $GITHUB_ENV
+#          echo "PREV_MINOR=$PREV_MINOR" >> $GITHUB_ENV
+#          echo "PREV_PATCH=$PREV_PATCH" >> $GITHUB_ENV
+#
+#      - name: Cancel if already versioned
+#        if: env.IS_CANCELLED == 'false'
+#        run: |
+#          if [[ "$MAJOR" != "$PREV_MAJOR" || "$MINOR" != "$PREV_MINOR" || "$PATCH" != "$PREV_PATCH" ]]; then
+#            echo "Version already incremented (major, minor, or patch differs from main). Cancelling workflow."
+#            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 0
+#          fi
+#
+#      - name: Increment version
+#        if: env.IS_CANCELLED == 'false'
+#        id: increment_version
+#        run: |
+#          # Defensive: ensure all values are integers
+#          MAJOR=${MAJOR:-0}
+#          MINOR=${MINOR:-0}
+#          PATCH=${PATCH:-0}
+#          PREV_MAJOR=${PREV_MAJOR:-0}
+#          PREV_MINOR=${PREV_MINOR:-0}
+#          PREV_PATCH=${PREV_PATCH:-0}
+#
+#          if [[ "$MAJOR" -gt "$PREV_MAJOR" ]]; then
+#            # Manual major bump detected
+#            MINOR=0
+#            PATCH=0
+#            echo "Manual major bump detected. Minor and patch reset to 0."
+#          elif [[ "$author_type" == "human" ]]; then
+#            MINOR=$((MINOR+1))
+#            PATCH=0
+#            echo "Author is human. Minor version increased, and patch reset to 0."
+#          else
+#            PATCH=$((PATCH+1))
+#            echo "Author is bot. Patch version increased."
+#          fi
+#          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+#          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+#          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
+#          echo "MINOR=$MINOR" >> $GITHUB_ENV
+#          echo "PATCH=$PATCH" >> $GITHUB_ENV
+#
+#      - name: Update version in libs.versions.toml
+#        if: env.IS_CANCELLED == 'false'
+#        run: |
+#          # Use portable sed for both macOS and Linux
+#          if sed --version 2>/dev/null | grep -q GNU; then
+#            SED_CMD="sed -i"
+#          else
+#            SED_CMD="sed -i ''"
+#          fi
+#          $SED_CMD -E "s/project-version-major[ ]*=[ ]*\"[0-9]+\"/project-version-major = \"$MAJOR\"/" gradle/libs.versions.toml
+#          $SED_CMD -E "s/project-version-minor[ ]*=[ ]*\"[0-9]+\"/project-version-minor = \"$MINOR\"/" gradle/libs.versions.toml
+#          $SED_CMD -E "s/project-version-patch[ ]*=[ ]*\"[0-9]+\"/project-version-patch = \"$PATCH\"/" gradle/libs.versions.toml
+#          echo "Updated version lines:" && grep 'project-version-' gradle/libs.versions.toml
+#
+#      - name: Commit and push version bump
+#        if: env.IS_CANCELLED == 'false'
+#        run: |
+#          git config --global user.name "github-actions"
+#          git config --global user.email "github-actions@github.com"
+#          git add gradle/libs.versions.toml
+#          if git diff --cached --exit-code; then
+#            echo "No changes to commit. Skipping push."
+#            exit 0
+#          fi
+#          git commit -m "Bump version to $new_version"
+#          git push origin HEAD:${{ github.head_ref }}
