@@ -11,7 +11,11 @@ jobs:
 
     permissions:
       contents: read
-      packages: write
+      packages: write # ⬅️ Required for Gradle to fetch from/push to GitHub Packages
+
+    env: # Expose secrets to Gradle
+      GITHUB_ACTOR: ${{ github.actor }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v5

@@ -10,9 +10,11 @@ permissions:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+
     env: # Expose secrets to Gradle
       GITHUB_ACTOR: ${{ github.actor }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - uses: actions/checkout@v5
 

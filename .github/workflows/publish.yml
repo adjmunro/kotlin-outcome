@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: write # Used by: dokka, dependency-submission, and github-packages
-  packages: write # Used byL github-packages
+  packages: write # Used by: github-packages (and all gradle builds need read access)
   pages: write # Used by: dokka
 
 jobs:
