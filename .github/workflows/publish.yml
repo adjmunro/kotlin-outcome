@@ -7,9 +7,9 @@ on:
       - main
 
 permissions:
-  contents: write
-  packages: write
-  pages: write
+  contents: write # Used by: dokka, dependency-submission, and github-packages
+  packages: write # Used byL github-packages
+  pages: write # Used by: dokka
 
 jobs:
   dokka:

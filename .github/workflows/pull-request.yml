@@ -8,9 +8,8 @@ on:
       - '**'
 
 permissions:
-  contents: write
-  pull-requests: write
-  packages: read
+  pull-requests: write # Used by: assign-author
+  packages: read # Used by: build and unit-tests to enable dependencies from Github Packages
 
 jobs:
   assign-author:
