@@ -7,9 +7,9 @@ on:
       - main
 
 permissions:
-  contents: write
-  packages: write
-  pages: write
+  contents: write # Used by: dokka, dependency-submission, and github-packages
+  packages: write # Used byL github-packages
+  pages: write # Used by: dokka
 
 jobs:
   dokka:
@@ -17,11 +17,7 @@ jobs:
 
   dependency-submission:
     uses: ./.github/workflows/dependency-submission.yml
-    secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
 
   github-packages:
     uses: ./.github/workflows/github-packages.yml
     needs: [dokka, dependency-submission ]
-    secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}

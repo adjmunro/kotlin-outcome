@@ -3,11 +3,16 @@ name: Unit Tests
 on:
   workflow_dispatch: # Manual dispatch from the Actions tab in GitHub.
   workflow_call: # Allows this workflow to be called from other workflows.
-    secrets: inherit
+
+permissions:
+  packages: read   # ⬅️ Required for Gradle to fetch from GitHub Packages
 
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+    env: # Expose secrets to Gradle
+      GITHUB_ACTOR: ${{ github.actor }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v5
 
@@ -15,9 +20,7 @@ jobs:
         uses: ./.github/actions/setup-gradle
 
       - name: Run Unit Tests
-        run: ./gradlew check
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew check --stacktrace
 
       - name: Upload Reports
         uses: actions/upload-artifact@v4

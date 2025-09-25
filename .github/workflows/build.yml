@@ -3,11 +3,16 @@ name: Build
 on:
   workflow_dispatch: # Manual dispatch from the Actions tab in GitHub.
   workflow_call: # Allows this workflow to be called from other workflows.
-    secrets: inherit
+
+permissions:
+  packages: read   # ⬅️ Required for Gradle to fetch from GitHub Packages
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env: # Expose secrets to Gradle
+      GITHUB_ACTOR: ${{ github.actor }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v5
 
@@ -16,5 +21,3 @@ jobs:
 
       - name: Execute Gradle Build
         run: ./gradlew build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

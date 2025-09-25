@@ -1,72 +1,72 @@
-name: Version Tag
-
-on:
-  workflow_dispatch: # Manual dispatch from the Actions tab in GitHub.
-  workflow_call: # Allows this workflow to be called from other workflows.
-
-jobs:
-  tag-version:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Reset Cancellation Flag
-        run: echo "IS_CANCELLED=false" >> $GITHUB_ENV
-
-      - name: Get current version
-        id: get_version
-        run: |
-          MAJOR=$(grep 'project-version-major' gradle/libs.versions.toml | cut -d'=' -f2 | tr -d ' "')
-          MINOR=$(grep 'project-version-minor' gradle/libs.versions.toml | cut -d'=' -f2 | tr -d ' "')
-          PATCH=$(grep 'project-version-patch' gradle/libs.versions.toml | cut -d'=' -f2 | tr -d ' "')
-          if ! [[ "$MAJOR" =~ ^[0-9]+$ && "$MINOR" =~ ^[0-9]+$ && "$PATCH" =~ ^[0-9]+$ ]]; then
-            echo >&2 "ERROR: Version fields in libs.versions.toml must be numbers. Found: major='$MAJOR', minor='$MINOR', patch='$PATCH'"
-            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
-          fi
-          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
-          echo "MINOR=$MINOR" >> $GITHUB_ENV
-          echo "PATCH=$PATCH" >> $GITHUB_ENV
-
-      - name: Get previous version from previous commit
-        if: env.IS_CANCELLED == 'false'
-        id: get_prev_version
-        run: |
-          PREV_MAJOR=$(git show HEAD^:gradle/libs.versions.toml | grep 'project-version-major' | cut -d'=' -f2 | tr -d ' "')
-          PREV_MINOR=$(git show HEAD^:gradle/libs.versions.toml | grep 'project-version-minor' | cut -d'=' -f2 | tr -d ' "')
-          PREV_PATCH=$(git show HEAD^:gradle/libs.versions.toml | grep 'project-version-patch' | cut -d'=' -f2 | tr -d ' "')
-          if ! [[ "$PREV_MAJOR" =~ ^[0-9]+$ && "$PREV_MINOR" =~ ^[0-9]+$ && "$PREV_PATCH" =~ ^[0-9]+$ ]]; then
-            echo >&2 "ERROR: Previous version fields in previous commit must be numbers. Found: major='$PREV_MAJOR', minor='$PREV_MINOR', patch='$PREV_PATCH'"
-            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
-          fi
-          echo "PREV_MAJOR=$PREV_MAJOR" >> $GITHUB_ENV
-          echo "PREV_MINOR=$PREV_MINOR" >> $GITHUB_ENV
-          echo "PREV_PATCH=$PREV_PATCH" >> $GITHUB_ENV
-
-      - name: Cancel if only patch increased
-        if: env.IS_CANCELLED == 'false'
-        run: |
-          if [[ "$MAJOR" == "$PREV_MAJOR" && "$MINOR" == "$PREV_MINOR" && "$PATCH" != "$PREV_PATCH" ]]; then
-            echo "Only patch version increased. No tag will be created."
-            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 0
-          fi
-          if [[ "$MAJOR" == "$PREV_MAJOR" && "$MINOR" == "$PREV_MINOR" && "$PATCH" == "$PREV_PATCH" ]]; then
-            echo >&2 "No version change detected. No tag will be created."
-            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
-          fi
-
-      - name: Create version tag
-        if: env.IS_CANCELLED == 'false'
-        run: |
-          TAG="v$MAJOR.$MINOR.$PATCH"
-          # Defensive: check if tag already exists
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo >&2 "Tag $TAG already exists. Skipping tag creation."
-            exit 1
-          fi
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git tag "$TAG"
-          git push origin "$TAG"
+#name: Version Tag
+#
+#on:
+#  workflow_dispatch: # Manual dispatch from the Actions tab in GitHub.
+#  workflow_call: # Allows this workflow to be called from other workflows.
+#
+#jobs:
+#  tag-version:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v5
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Reset Cancellation Flag
+#        run: echo "IS_CANCELLED=false" >> $GITHUB_ENV
+#
+#      - name: Get current version
+#        id: get_version
+#        run: |
+#          MAJOR=$(grep 'project-version-major' gradle/libs.versions.toml | cut -d'=' -f2 | tr -d ' "')
+#          MINOR=$(grep 'project-version-minor' gradle/libs.versions.toml | cut -d'=' -f2 | tr -d ' "')
+#          PATCH=$(grep 'project-version-patch' gradle/libs.versions.toml | cut -d'=' -f2 | tr -d ' "')
+#          if ! [[ "$MAJOR" =~ ^[0-9]+$ && "$MINOR" =~ ^[0-9]+$ && "$PATCH" =~ ^[0-9]+$ ]]; then
+#            echo >&2 "ERROR: Version fields in libs.versions.toml must be numbers. Found: major='$MAJOR', minor='$MINOR', patch='$PATCH'"
+#            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
+#          fi
+#          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
+#          echo "MINOR=$MINOR" >> $GITHUB_ENV
+#          echo "PATCH=$PATCH" >> $GITHUB_ENV
+#
+#      - name: Get previous version from previous commit
+#        if: env.IS_CANCELLED == 'false'
+#        id: get_prev_version
+#        run: |
+#          PREV_MAJOR=$(git show HEAD^:gradle/libs.versions.toml | grep 'project-version-major' | cut -d'=' -f2 | tr -d ' "')
+#          PREV_MINOR=$(git show HEAD^:gradle/libs.versions.toml | grep 'project-version-minor' | cut -d'=' -f2 | tr -d ' "')
+#          PREV_PATCH=$(git show HEAD^:gradle/libs.versions.toml | grep 'project-version-patch' | cut -d'=' -f2 | tr -d ' "')
+#          if ! [[ "$PREV_MAJOR" =~ ^[0-9]+$ && "$PREV_MINOR" =~ ^[0-9]+$ && "$PREV_PATCH" =~ ^[0-9]+$ ]]; then
+#            echo >&2 "ERROR: Previous version fields in previous commit must be numbers. Found: major='$PREV_MAJOR', minor='$PREV_MINOR', patch='$PREV_PATCH'"
+#            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
+#          fi
+#          echo "PREV_MAJOR=$PREV_MAJOR" >> $GITHUB_ENV
+#          echo "PREV_MINOR=$PREV_MINOR" >> $GITHUB_ENV
+#          echo "PREV_PATCH=$PREV_PATCH" >> $GITHUB_ENV
+#
+#      - name: Cancel if only patch increased
+#        if: env.IS_CANCELLED == 'false'
+#        run: |
+#          if [[ "$MAJOR" == "$PREV_MAJOR" && "$MINOR" == "$PREV_MINOR" && "$PATCH" != "$PREV_PATCH" ]]; then
+#            echo "Only patch version increased. No tag will be created."
+#            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 0
+#          fi
+#          if [[ "$MAJOR" == "$PREV_MAJOR" && "$MINOR" == "$PREV_MINOR" && "$PATCH" == "$PREV_PATCH" ]]; then
+#            echo >&2 "No version change detected. No tag will be created."
+#            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
+#          fi
+#
+#      - name: Create version tag
+#        if: env.IS_CANCELLED == 'false'
+#        run: |
+#          TAG="v$MAJOR.$MINOR.$PATCH"
+#          # Defensive: check if tag already exists
+#          if git rev-parse "$TAG" >/dev/null 2>&1; then
+#            echo >&2 "Tag $TAG already exists. Skipping tag creation."
+#            exit 1
+#          fi
+#          git config --global user.name "github-actions"
+#          git config --global user.email "github-actions@github.com"
+#          git tag "$TAG"
+#          git push origin "$TAG"

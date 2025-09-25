@@ -1,50 +1,50 @@
-name: Changelog Release
-on:
-  workflow_call:
-jobs:
-  changelog-release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Reset Cancellation Flag
-        run: echo "IS_CANCELLED=false" >> $GITHUB_ENV
-
-      - name: Get latest tag
-        id: get_tag
-        run: |
-          TAG=$(git describe --tags --abbrev=0)
-          if [ -z "$TAG" ]; then
-            echo >&2 "ERROR: No tags found. Cannot create release."
-            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
-          fi
-          echo "TAG=$TAG" >> $GITHUB_ENV
-
-      - name: Generate changelog
-        if: env.IS_CANCELLED == 'false'
-        id: changelog
-        run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
-          if [ -z "$PREV_TAG" ]; then
-            echo >&2 "ERROR: No previous tag found. Cannot generate changelog."
-            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
-          fi
-          echo "Generating changelog from $PREV_TAG to $TAG"
-          CHANGELOG=$(git log $PREV_TAG..$TAG --pretty=format:'* %s (%an)' --no-merges)
-          if [ -z "$CHANGELOG" ]; then
-            echo >&2 "No commits found between $PREV_TAG and $TAG. Changelog will be empty."
-          fi
-          echo "$CHANGELOG" > changelog.txt
-
-      - name: Create GitHub Release
-        if: env.IS_CANCELLED == 'false'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          name: Release ${{ env.TAG }}
-          body_path: changelog.txt
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#name: Changelog Release
+#on:
+#  workflow_call:
+#jobs:
+#  changelog-release:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v5
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Reset Cancellation Flag
+#        run: echo "IS_CANCELLED=false" >> $GITHUB_ENV
+#
+#      - name: Get latest tag
+#        id: get_tag
+#        run: |
+#          TAG=$(git describe --tags --abbrev=0)
+#          if [ -z "$TAG" ]; then
+#            echo >&2 "ERROR: No tags found. Cannot create release."
+#            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
+#          fi
+#          echo "TAG=$TAG" >> $GITHUB_ENV
+#
+#      - name: Generate changelog
+#        if: env.IS_CANCELLED == 'false'
+#        id: changelog
+#        run: |
+#          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
+#          if [ -z "$PREV_TAG" ]; then
+#            echo >&2 "ERROR: No previous tag found. Cannot generate changelog."
+#            echo "IS_CANCELLED=true" >> $GITHUB_ENV && exit 1
+#          fi
+#          echo "Generating changelog from $PREV_TAG to $TAG"
+#          CHANGELOG=$(git log $PREV_TAG..$TAG --pretty=format:'* %s (%an)' --no-merges)
+#          if [ -z "$CHANGELOG" ]; then
+#            echo >&2 "No commits found between $PREV_TAG and $TAG. Changelog will be empty."
+#          fi
+#          echo "$CHANGELOG" > changelog.txt
+#
+#      - name: Create GitHub Release
+#        if: env.IS_CANCELLED == 'false'
+#        uses: softprops/action-gh-release@v2
+#        with:
+#          tag_name: ${{ env.TAG }}
+#          name: Release ${{ env.TAG }}
+#          body_path: changelog.txt
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
