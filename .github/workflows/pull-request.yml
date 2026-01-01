@@ -13,15 +13,14 @@ permissions:
 
 jobs:
   assign-author:
-    uses: ./.github/workflows/assign-author.yml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: toshimaru/auto-author-assign@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     uses: ./.github/workflows/build.yml
 
   unit-tests:
     uses: ./.github/workflows/unit-tests.yml
-
-  # Only run for PRs created by dependabot after other all checks pass (i.e. build & unit tests)
-  automerge-dependabot:
-    uses: ./.github/workflows/automerge-dependabot.yml
-    needs: [ build, unit-tests ]
