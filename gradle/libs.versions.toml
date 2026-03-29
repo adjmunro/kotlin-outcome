@@ -26,17 +26,17 @@ java-toolchain = "21"
 java-bytecode = "17"
 
 # Kotlin Language/Compiler Version
-kotlin-language = "2.2.20"
+kotlin-language = "2.3.10"
 
 ####################################################################################################
 ########################################   App Libraries   #########################################
 ####################################################################################################
-adjmunro-inline = "0.3.0"
-dokka = "2.0.0"
-jetbrains-atomicfu = "0.29.0"
-jetbrains-coroutines = "1.10.2"
-junit5 = "5.13.4"
-kotest = "6.0.3"
+adjmunro-inline = "0.3.0" # https://github.com/adjmunro/kotlin-utils/releases
+dokka = "2.1.0" # https://github.com/Kotlin/dokka/releases
+jetbrains-atomicfu = "0.31.0" # https://github.com/Kotlin/kotlinx-atomicfu/releases
+jetbrains-coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
+junit5 = "6.0.3" # https://github.com/junit-team/junit-framework/releases
+kotest = "6.1.7" # https://github.com/kotest/kotest/releases
 
 ####################################################################################################
 ####                                                                                             ###
