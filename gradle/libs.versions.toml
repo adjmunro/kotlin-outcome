@@ -26,12 +26,11 @@ java-toolchain = "21"
 java-bytecode = "17"
 
 # Kotlin Language/Compiler Version
-kotlin-language = "2.3.10"
+kotlin-language = "2.3.20"
 
 ####################################################################################################
 ########################################   App Libraries   #########################################
 ####################################################################################################
-adjmunro-inline = "0.3.0" # https://github.com/adjmunro/kotlin-utils/releases
 dokka = "2.1.0" # https://github.com/Kotlin/dokka/releases
 jetbrains-atomicfu = "0.31.0" # https://github.com/Kotlin/kotlinx-atomicfu/releases
 jetbrains-coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
@@ -53,7 +52,6 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-language" 
 ####                                                                                             ###
 ####################################################################################################
 [libraries]
-adjmunro-inline = { group = "nz.adjmunro", name = "inline-jvm", version.ref = "adjmunro-inline" }
 jetbrains-atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "jetbrains-atomicfu" }
 jetbrains-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "jetbrains-coroutines" }
 jetbrains-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "jetbrains-coroutines" }
@@ -71,7 +69,6 @@ kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.re
 ####################################################################################################
 [bundles]
 core = [
-    "adjmunro-inline",
     "jetbrains-atomicfu",
     "jetbrains-coroutines-core",
     "kotlin-stdlib",
