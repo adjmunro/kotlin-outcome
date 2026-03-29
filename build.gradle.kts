@@ -57,7 +57,6 @@ kotlin {
             "-Xcontext-sensitive-resolution",
             "-Xannotation-target-all",
             "-Xannotation-default-target=param-property",
-            "-Xnested-type-aliases",
 
             "-opt-in=kotlin.experimental.ExperimentalTypeInference",
             "-opt-in=kotlin.contracts.ExperimentalContracts",

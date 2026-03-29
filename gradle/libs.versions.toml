@@ -34,7 +34,7 @@ kotlin-language = "2.3.20"
 dokka = "2.1.0" # https://github.com/Kotlin/dokka/releases
 jetbrains-atomicfu = "0.31.0" # https://github.com/Kotlin/kotlinx-atomicfu/releases
 jetbrains-coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
-junit5 = "6.0.3" # https://github.com/junit-team/junit-framework/releases
+junit6 = "6.0.3" # https://github.com/junit-team/junit-framework/releases
 kotest = "6.1.7" # https://github.com/kotest/kotest/releases
 
 ####################################################################################################
@@ -55,7 +55,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-language" 
 jetbrains-atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "jetbrains-atomicfu" }
 jetbrains-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "jetbrains-coroutines" }
 jetbrains-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "jetbrains-coroutines" }
-junit5 = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit5" }
+junit6 = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit6" }
 kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { group = "io.kotest", name = "kotest-property", version.ref = "kotest" }
 kotlin-bom = { group = "org.jetbrains.kotlin", name = "kotlin-bom", version.ref = "kotlin-language" }
@@ -75,7 +75,7 @@ core = [
 ]
 test = [
     "jetbrains-coroutines-test",
-    "junit5",
+    "junit6",
     "kotest-assertions",
     "kotest-property",
     "kotlin-test",
