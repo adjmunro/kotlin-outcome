@@ -3,6 +3,7 @@ package nz.adjmunro.outcome.members
 import nz.adjmunro.outcome.Failure
 import nz.adjmunro.outcome.Outcome
 import nz.adjmunro.outcome.Success
+import nz.adjmunro.outcome.throwable.asThrowable
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -80,4 +81,60 @@ public inline infix fun <Ok, Error> Outcome<Ok, Error>.onFailure(
     contract { callsInPlace(lambda = block, kind = InvocationKind.AT_MOST_ONCE) }
     if (isFailure()) block(error)
     return this@onFailure
+}
+
+/**
+ * Throws if this is a [Failure][nz.adjmunro.outcome.Failure] **and** [predicate] returns `true` for the error.
+ * Returns the original [Outcome][nz.adjmunro.outcome.Outcome] unchanged otherwise.
+ *
+ * @param fallbackMessage Produces the exception message from the error value. Only used when [Error] is not
+ *   already a [Throwable] or [nz.adjmunro.outcome.throwable.ThrowableWrapper] — in those cases the
+ *   existing exception is thrown as-is and this parameter is ignored.
+ * @param predicate Returns `true` if the error should be thrown.
+ * @throws Throwable The [Error] itself if it is a [Throwable], or its
+ *   [cause][nz.adjmunro.outcome.throwable.ThrowableWrapper.cause] if it is a
+ *   [ThrowableWrapper][nz.adjmunro.outcome.throwable.ThrowableWrapper], when [predicate] returns `true`.
+ * @throws NullPointerException If the [Error] is `null` and [predicate] returns `true`.
+ * @throws IllegalStateException If the [Error] is any other non-throwable type and [predicate] returns `true`.
+ * @see nz.adjmunro.outcome.throwable.asThrowable
+ */
+public inline fun <Ok, Error> Outcome<Ok, Error>.throwIf(
+    fallbackMessage: (Error) -> String = { "Outcome was Failure and throwIf predicate was true: $it" },
+    predicate: (Error) -> Boolean
+): Outcome<Ok, Error> {
+    contract { callsInPlace(lambda = predicate, kind = InvocationKind.AT_MOST_ONCE) }
+
+    if(isFailure() && predicate(error)) {
+        throw error.asThrowable(fallbackMessage = fallbackMessage)
+    }
+
+    return this@throwIf
+}
+
+/**
+ * Throws if this is a [Failure][nz.adjmunro.outcome.Failure] **and** [predicate] returns `false` for the error.
+ * Returns the original [Outcome][nz.adjmunro.outcome.Outcome] unchanged otherwise.
+ *
+ * @param fallbackMessage Produces the exception message from the error value. Only used when [Error] is not
+ *   already a [Throwable] or [nz.adjmunro.outcome.throwable.ThrowableWrapper] — in those cases the
+ *   existing exception is thrown as-is and this parameter is ignored.
+ * @param predicate Returns `false` if the error should be thrown.
+ * @throws Throwable The [Error] itself if it is a [Throwable], or its
+ *   [cause][nz.adjmunro.outcome.throwable.ThrowableWrapper.cause] if it is a
+ *   [ThrowableWrapper][nz.adjmunro.outcome.throwable.ThrowableWrapper], when [predicate] returns `false`.
+ * @throws NullPointerException If the [Error] is `null` and [predicate] returns `false`.
+ * @throws IllegalStateException If the [Error] is any other non-throwable type and [predicate] returns `false`.
+ * @see nz.adjmunro.outcome.throwable.asThrowable
+ */
+public inline fun <Ok, Error> Outcome<Ok, Error>.throwUnless(
+    fallbackMessage: (Error) -> String = { "Outcome was Failure and throwUnless predicate was false: $it" },
+    predicate: (Error) -> Boolean,
+): Outcome<Ok, Error> {
+    contract { callsInPlace(lambda = predicate, kind = InvocationKind.AT_MOST_ONCE) }
+
+    if(isFailure() && !predicate(error)) {
+        throw error.asThrowable(fallbackMessage = fallbackMessage)
+    }
+
+    return this@throwUnless
 }
