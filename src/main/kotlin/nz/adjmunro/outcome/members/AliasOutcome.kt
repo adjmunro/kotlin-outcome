@@ -2,7 +2,6 @@ package nz.adjmunro.outcome.members
 
 import kotlinx.coroutines.flow.Flow
 import nz.adjmunro.outcome.Outcome
-import nz.adjmunro.outcome.raise.RaiseScope
 
 /**
  * Alias for [Outcome][nz.adjmunro.outcome.Outcome] used when only the error is useful — the success is irrelevant.

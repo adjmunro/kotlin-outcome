@@ -1,8 +1,8 @@
 package nz.adjmunro.outcome.result
 
 import kotlinx.coroutines.Deferred
-import nz.adjmunro.outcome.annotation.UnsafeForCoroutineCancellation
 import nz.adjmunro.outcome.Outcome
+import nz.adjmunro.outcome.annotation.UnsafeForCoroutineCancellation
 import nz.adjmunro.outcome.members.rfold
 import nz.adjmunro.outcome.throwable.asThrowable
 

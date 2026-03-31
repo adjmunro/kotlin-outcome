@@ -1,8 +1,6 @@
 package nz.adjmunro.outcome.result
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.runTest

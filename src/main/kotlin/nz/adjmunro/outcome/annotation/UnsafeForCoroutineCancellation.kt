@@ -1,5 +1,9 @@
 package nz.adjmunro.outcome.annotation
 
+import nz.adjmunro.outcome.raise.RaiseScope.Companion.catching
+import nz.adjmunro.outcome.raise.RaiseScope.Companion.fold
+
+
 /**
  * Opt-in marker for functions that **do not** call [ensureActive][kotlinx.coroutines.ensureActive],
  * meaning [CancellationException][kotlinx.coroutines.CancellationException] may be silently suppressed.

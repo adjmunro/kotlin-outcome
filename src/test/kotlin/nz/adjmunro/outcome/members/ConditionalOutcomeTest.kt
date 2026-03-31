@@ -1,7 +1,6 @@
 package nz.adjmunro.outcome.members
 
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import nz.adjmunro.outcome.Failure
 import nz.adjmunro.outcome.Outcome
 import nz.adjmunro.outcome.Success

@@ -2,15 +2,17 @@
 
 package nz.adjmunro.outcome.raise
 
-import nz.adjmunro.outcome.raise.RaiseScope.Companion.catching
-import nz.adjmunro.outcome.raise.RaiseScope.Companion.folding
-import nz.adjmunro.outcome.raise.RaiseScope.Companion.raise
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import nz.adjmunro.outcome.annotation.EnsuresActiveCoroutine
 import nz.adjmunro.outcome.annotation.UnsafeForCoroutineCancellation
 import nz.adjmunro.outcome.inline.rethrow
+import nz.adjmunro.outcome.raise.RaiseScope.Companion.catch
+import nz.adjmunro.outcome.raise.RaiseScope.Companion.catching
+import nz.adjmunro.outcome.raise.RaiseScope.Companion.fold
+import nz.adjmunro.outcome.raise.RaiseScope.Companion.folding
+import nz.adjmunro.outcome.raise.RaiseScope.Companion.raise
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.reflect.KClass

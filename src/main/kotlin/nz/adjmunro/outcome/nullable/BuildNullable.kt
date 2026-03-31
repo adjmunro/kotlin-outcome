@@ -1,10 +1,10 @@
 package nz.adjmunro.outcome.nullable
 
-import nz.adjmunro.outcome.annotation.EnsuresActiveCoroutine
-import nz.adjmunro.outcome.annotation.UnsafeForCoroutineCancellation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import nz.adjmunro.outcome.annotation.EnsuresActiveCoroutine
+import nz.adjmunro.outcome.annotation.UnsafeForCoroutineCancellation
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 

@@ -4,6 +4,7 @@ import nz.adjmunro.outcome.Failure
 import nz.adjmunro.outcome.Outcome
 import nz.adjmunro.outcome.Success
 import nz.adjmunro.outcome.inline.itself
+import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 /**
@@ -32,8 +33,8 @@ public inline fun <In, Out, ErrorIn, ErrorOut> Outcome<In, ErrorIn>.map(
     success: (In) -> Out,
 ): Outcome<Out, ErrorOut> {
     contract {
-        callsInPlace(lambda = success, kind = AT_MOST_ONCE)
-        callsInPlace(lambda = failure, kind = AT_MOST_ONCE)
+        callsInPlace(lambda = success, kind = InvocationKind.AT_MOST_ONCE)
+        callsInPlace(lambda = failure, kind = InvocationKind.AT_MOST_ONCE)
     }
 
     return fold(

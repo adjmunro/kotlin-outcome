@@ -7,10 +7,8 @@ import nz.adjmunro.outcome.annotation.EnsuresActiveCoroutine
 import nz.adjmunro.outcome.inline.rethrow
 import nz.adjmunro.outcome.raise.DefaultRaiseScope
 import nz.adjmunro.outcome.raise.RaiseScope
-import nz.adjmunro.outcome.raise.RaiseScope.Companion.catching
 import nz.adjmunro.outcome.raise.RaiseScope.Companion.folding
 import nz.adjmunro.outcome.raise.RaiseScope.Companion.raise
-import nz.adjmunro.outcome.raise.RaiseScope.Companion.raises
 
 /**
  * Suspend variant of [catchException][nz.adjmunro.outcome.members.catchException] builder.

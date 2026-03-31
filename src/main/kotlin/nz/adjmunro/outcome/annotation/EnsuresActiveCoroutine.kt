@@ -1,5 +1,9 @@
 package nz.adjmunro.outcome.annotation
 
+import nz.adjmunro.outcome.raise.RaiseScope.Companion.catching
+import nz.adjmunro.outcome.raise.RaiseScope.Companion.folding
+
+
 /**
  * Marks `suspend` functions that [ensureActive][kotlinx.coroutines.ensureActive].
  *

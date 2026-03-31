@@ -1,12 +1,10 @@
 package nz.adjmunro.outcome.members
 
-import kotlinx.coroutines.Deferred
 import nz.adjmunro.outcome.Failure
 import nz.adjmunro.outcome.Outcome
 import nz.adjmunro.outcome.Success
 import nz.adjmunro.outcome.inline.unit
 import nz.adjmunro.outcome.result.KotlinResult
-import nz.adjmunro.outcome.result.resultOf
 import nz.adjmunro.outcome.throwable.ThrowableWrapper
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract

@@ -7,13 +7,10 @@ import nz.adjmunro.outcome.Outcome
 import nz.adjmunro.outcome.Success
 import nz.adjmunro.outcome.annotation.UnsafeForCoroutineCancellation
 import nz.adjmunro.outcome.inline.rethrow
-import nz.adjmunro.outcome.inline.unit
 import nz.adjmunro.outcome.raise.DefaultRaiseScope
 import nz.adjmunro.outcome.raise.RaiseScope
-import nz.adjmunro.outcome.raise.RaiseScope.Companion.catching
 import nz.adjmunro.outcome.raise.RaiseScope.Companion.fold
 import nz.adjmunro.outcome.raise.RaiseScope.Companion.raise
-import nz.adjmunro.outcome.raise.RaiseScope.Companion.raises
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
