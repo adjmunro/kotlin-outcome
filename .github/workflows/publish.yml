@@ -20,4 +20,4 @@ jobs:
 
   github-packages:
     uses: ./.github/workflows/github-packages.yml
-    needs: [dokka, dependency-submission ]
+    needs: [ dokka, dependency-submission ]

@@ -3,7 +3,7 @@ description: 'Sets up Java 21 for Kotlin/Java projects.'
 runs:
   using: 'composite'
   steps:
-    - uses: actions/setup-java@v4
+    - uses: actions/setup-java@v5
       with:
         distribution: temurin
         java-version: 21

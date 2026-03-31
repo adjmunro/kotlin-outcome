@@ -10,7 +10,7 @@
 project-group-id = "nz.adjmunro"
 project-artifact-id = "outcome"
 project-version-major = "0"
-project-version-minor = "3"
+project-version-minor = "4"
 project-version-patch = "0"
 project-android-compileSdk = "36"
 project-android-minSdk = "1"
@@ -26,17 +26,16 @@ java-toolchain = "21"
 java-bytecode = "17"
 
 # Kotlin Language/Compiler Version
-kotlin-language = "2.2.20"
+kotlin-language = "2.3.20"
 
 ####################################################################################################
 ########################################   App Libraries   #########################################
 ####################################################################################################
-adjmunro-inline = "0.3.0"
-dokka = "2.0.0"
-jetbrains-atomicfu = "0.29.0"
-jetbrains-coroutines = "1.10.2"
-junit5 = "5.13.4"
-kotest = "6.0.3"
+dokka = "2.1.0" # https://github.com/Kotlin/dokka/releases
+jetbrains-atomicfu = "0.31.0" # https://github.com/Kotlin/kotlinx-atomicfu/releases
+jetbrains-coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
+junit6 = "6.0.3" # https://github.com/junit-team/junit-framework/releases
+kotest = "6.1.7" # https://github.com/kotest/kotest/releases
 
 ####################################################################################################
 ####                                                                                             ###
@@ -53,11 +52,10 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-language" 
 ####                                                                                             ###
 ####################################################################################################
 [libraries]
-adjmunro-inline = { group = "nz.adjmunro", name = "inline-jvm", version.ref = "adjmunro-inline" }
 jetbrains-atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "jetbrains-atomicfu" }
 jetbrains-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "jetbrains-coroutines" }
 jetbrains-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "jetbrains-coroutines" }
-junit5 = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit5" }
+junit6 = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit6" }
 kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { group = "io.kotest", name = "kotest-property", version.ref = "kotest" }
 kotlin-bom = { group = "org.jetbrains.kotlin", name = "kotlin-bom", version.ref = "kotlin-language" }
@@ -71,14 +69,13 @@ kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.re
 ####################################################################################################
 [bundles]
 core = [
-    "adjmunro-inline",
     "jetbrains-atomicfu",
     "jetbrains-coroutines-core",
     "kotlin-stdlib",
 ]
 test = [
     "jetbrains-coroutines-test",
-    "junit5",
+    "junit6",
     "kotest-assertions",
     "kotest-property",
     "kotlin-test",
